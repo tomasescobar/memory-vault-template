@@ -1,0 +1,104 @@
+openapi: 3.1.0
+info:
+  title: memoryVault
+  description: >
+    Lee y escribe el repo privado {{OWNER}}/{{REPO}} (memoria canónica de
+    {{NAME}}) a través de la API REST de GitHub. El contenido de los archivos viaja
+    en base64 en ambas direcciones.
+  version: 1.0.0
+servers:
+  - url: https://api.github.com
+paths:
+  /repos/{{OWNER}}/{{REPO}}/git/trees/main:
+    get:
+      operationId: listFiles
+      summary: Lista todos los archivos del vault (árbol recursivo de main).
+      parameters:
+        - name: recursive
+          in: query
+          required: true
+          schema:
+            type: string
+            default: "1"
+      responses:
+        "200":
+          description: Árbol del repo.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tree:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        path: { type: string }
+                        type: { type: string, description: blob o tree }
+  /repos/{{OWNER}}/{{REPO}}/contents/{path}:
+    get:
+      operationId: readFile
+      summary: Lee un archivo. Devuelve content en base64 y el sha (necesario para actualizarlo).
+      parameters:
+        - name: path
+          in: path
+          required: true
+          schema: { type: string }
+          description: Ruta dentro del repo, p. ej. PROFILE.md o journal/2026-10-07-gpt.md
+        - name: ref
+          in: query
+          required: false
+          schema: { type: string, default: main }
+      responses:
+        "200":
+          description: Archivo encontrado.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  path: { type: string }
+                  sha: { type: string }
+                  encoding: { type: string }
+                  content:
+                    type: string
+                    description: Contenido del archivo en base64 (puede traer saltos de línea).
+        "404":
+          description: El archivo no existe. Para crearlo usar writeFile sin sha.
+    put:
+      operationId: writeFile
+      summary: Crea o actualiza un archivo. Para actualizar es obligatorio mandar el sha actual.
+      parameters:
+        - name: path
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [message, content]
+              properties:
+                message:
+                  type: string
+                  description: 'Mensaje de commit, p. ej. "journal(gpt): preferencia de formato"'
+                content:
+                  type: string
+                  description: Contenido COMPLETO del archivo en base64 (no sólo la entrada nueva).
+                sha:
+                  type: string
+                  description: sha actual del archivo (de readFile). Omitir sólo al crear un archivo nuevo.
+                branch:
+                  type: string
+                  default: main
+      responses:
+        "200":
+          description: Archivo actualizado.
+        "201":
+          description: Archivo creado.
+        "409":
+          description: Conflicto, el sha no coincide. Volver a hacer readFile y reintentar.
+        "422":
+          description: Falta el sha para un archivo que ya existe, o base64 inválido.
