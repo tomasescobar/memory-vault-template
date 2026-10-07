@@ -18,7 +18,7 @@ de verdad es el archivo.**
    ./bootstrap.sh
    ```
    Detecta `owner/repo` del remoto, te pregunta tu nombre y rellena los
-   placeholders (`{{OWNER}}`, `{{REPO}}`, `{{NAME}}`, `{{VAULT_PATH}}`) en todos
+   placeholders (OWNER, REPO, NAME y VAULT_PATH, escritos entre dobles llaves) en todos
    los archivos. Si usás Claude Code, instala la regla global en `~/.claude/rules/`.
 3. Completá `PROFILE.md` y `PREFERENCES.md`. Para arrancar, pedile a cada modelo su
    memoria verbatim (rol, proyectos, preferencias, correcciones), partila en esos
