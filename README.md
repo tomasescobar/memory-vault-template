@@ -77,7 +77,7 @@ CONSOLIDATE.md      # checklist de la consolidación semanal
 | Cliente | Lee / escribe | Cómo |
 |---|---|---|
 | Claude Code | shell + git | `clients/claude-code.md` |
-| Claude.ai (web / desktop) | MCP de GitHub | `clients/claude-code.md` |
+| Claude.ai (web / desktop) | conector MCP de GitHub + Project | `clients/claude-ai.md` |
 | GPT custom | Action sobre la API REST de GitHub | `clients/chatgpt.md` |
 | Grok Bots (VM) | shell + git | `clients/grok-bots.md` |
 | Grok chat | ninguno | es caché; lo importante se baja a mano |
